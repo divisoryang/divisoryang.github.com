@@ -27,11 +27,11 @@ tags: [iOS]
 
 	首先要了解frame, bounds, center的定义
 
-	
+```	
 		frame：描述当前视图在其父视图中的位置和大小。  
 		bounds：描述当前视图在其自身坐标系统中的位置和大小。  
 		center：描述当前视图的中心点在其父视图中的位置。   
-		
+```
 
 	由定义可知这时取得[UIScreen mainScreen].applicationFrame 可能不是最终大小，应该从UIWindow的bounds中获取UIView的目标大小
 
