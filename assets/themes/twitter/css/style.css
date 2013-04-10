@@ -232,7 +232,7 @@ blockquote::after {
 
 blockquote p {
     font-size: 14px;
-    padding: 0px 0;
+    padding: 10px 0;
 }
 
 blockquote.pull-right {
