@@ -7,19 +7,19 @@ tags: [objc iOS]
 ---
 {% include JB/setup %}
 
-我是根据 [手把手教你ARC][0] 入门的，里面介绍了ARC的一些特性， 还有将非ARC工程转换成ARC工程的方法
+[手把手教你ARC][0]，里面介绍了ARC的一些特性， 还有将非ARC工程转换成ARC工程的方法
 
-然后看了 [ARC 苹果官方文档][1]
+[ARC 苹果官方文档][1]
 
-下面用我自己的话介绍一下ARC，并将看文档过程中的疑问和答案写下来。
+下面用我自己的话介绍一下ARC，并将看文档过程中的疑问和答案写下来。  
 
 * 下面有些是翻译，但不是全部，请一定要看一遍官方文档
 
 * 不考虑 iOS4 的 ARC 规则
 
-#### 简单地说，ARC在编译时刻为代码在合适的位置加上retain 和 release. 复杂点，它还提供其它一些功能，还为解决一些问题，添加了一些关键字和功能，后面会说。
+### 简单地说，ARC在编译时刻为代码在合适的位置加上retain 和 release. 复杂点，它还提供其它一些功能，还为解决一些问题，添加了一些关键字和功能，后面会说。
 
-### ARC强制要求的新规则
+## ARC强制要求的新规则
 
 * 不可以调用dealloc, 不可以实现或者调用retain, release, retainCount, autorelease.
 * 不可以使用NSAllocateObject, NSDeallocateObject
@@ -44,9 +44,9 @@ tags: [objc iOS]
 		// words:
 		@property (getter=theNewTitle) NSString *newTitle;
 	
-### 属性声明
+## 属性声明
 
-#### 引入了weak, strong, unsafe_unretained, 去掉了retain, 保留了assign 其余不变
+### 引入了weak, strong, unsafe_unretained, 去掉了retain, 保留了assign 其余不变
 
 * strong 相当于 MRC(Manual Reference Counting) 的 retain
 * weak 相当于 MRC 的 assign 但是 在指向的对象被销毁的时候，指针会被设置成0
@@ -75,7 +75,7 @@ tags: [objc iOS]
 * unsafe_unretained 和原来的 assign行为最像.
 * 对于手动写 setter getter 又设置了修饰符的情况，我没有研究
 	
-#### 在这里我想到好多问题
+### 在这里我想到好多问题
 
 1. 声明了属性@property (weak) NSString \*member 对应的成员变量 NSString \*\_member (成员变量里没有写\_\_weak)会怎样
 		
@@ -87,7 +87,7 @@ tags: [objc iOS]
 
 3. 其余问题可以从上面两个问题和答案推导.
 
-### 变量修饰符
+## 变量修饰符
 
 下面的变量表示Objective C对象变量
 
@@ -130,7 +130,7 @@ tags: [objc iOS]
 	其实可以直接使用 NSError * __autoreleasing error; 来增加效率。
 	
 	
-#### ARC根据上面那些修饰符自动生成额外的代码。
+### ARC根据上面那些修饰符自动生成额外的代码。
 
 对于 \_\_strong
 
@@ -155,7 +155,7 @@ tags: [objc iOS]
 
 	NSNumber * number = [[[NSNumber alloc] initWithInt:13] autorelease];
 
-#### 修饰符还可以告诉编译器代码的行为
+### 修饰符还可以告诉编译器代码的行为
 
 例如
 
@@ -164,7 +164,7 @@ tags: [objc iOS]
 
 myObject 的 performOperationWithError 使用的可能是 MRC 的代码， 也可能是 ARC的代码， 但它参数返回的肯定是一个autorelease的对象。 有了 __autoreleasing 修饰， 编译器可以知道从 performOperationWithError 方法获得 tmp 后不需要处理它的内存问题。
 
-### __weak 的实现
+## __weak 的实现
 
 \_\_weak 指针在对象被销毁的时候会被设置成 nil, 这个功能很好很强大, 避免了很多问题, 但看上去不是在某处插入个 [obj release]; obj = nil; 就可以实现了的。
 
@@ -174,7 +174,7 @@ myObject 的 performOperationWithError 使用的可能是 MRC 的代码， 也�
 
 	ARC 的 NSObject 里大概添加了一个 weak 指针的数组，当对象销毁的时候，把数组里的变量都设置为 nil (表述不严谨，大概就是这个意思)
 
-### 防止循环引用和长时间过程中被销毁(下面可能存在误导，要批判地看！)
+## 防止循环引用和长时间过程中被销毁(下面可能存在误导，要批判地看！)
 	
 在 MRC 中 \_\_block id x = y; block 将不会 [x retain]; 在block执行完之后也不会 [x release];  
 
@@ -219,7 +219,7 @@ myObject 的 performOperationWithError 使用的可能是 MRC 的代码， 也�
 
 到此表面问题基本解决。
 
-#### 一个古怪的行为
+### 一个古怪的行为
 
 有代码如下：
 	
@@ -273,7 +273,7 @@ myObject 的 performOperationWithError 使用的可能是 MRC 的代码， 也�
 的位置 [[aa_weak retain] autorelease] 了一遍。表示不懂。
 
 
-### Toll-Free Bridging
+## Toll-Free Bridging
 
 * __bridge : Objective-C 和 Core Foundation 之间的转换， 拥有权不变。
 * __bridge_retained : 从 Objective-C 到 Core Foundation 的转换，由程序员负责把得到的 CFxxxRef 销毁
@@ -282,7 +282,7 @@ myObject 的 performOperationWithError 使用的可能是 MRC 的代码， 也�
 \_\_bridge\_retained 的作用等于 CFBridgingRetain  
 \_\_bridge\_transfer 的作用等于 CFBridgingRelease
 
-#### Cocoa 方法返回的 CF 对象
+### Cocoa 方法返回的 CF 对象
 
 比如 [[UIColor greenColor] CGColor]; 编译器知道返回的 CFxxxRef 是不是需要 release 的， 当需要把它在此转换成 Cocoa 对象的时候， 不必用 \_\_bridge \_\_bridge_transfer 这样的修饰符， 但需要显式写出要转换成的类型， 比如：
 
